@@ -1,0 +1,13 @@
+{
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:HybridFox/html5-game.git"
+  },
+  "name": "HTML5GAME",
+  "author": "Felikx, Siem, Michiel, Kenzo",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": "^4.13.4",
+    "socket.io": "^1.4.5"
+  }
+}
