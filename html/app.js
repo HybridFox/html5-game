@@ -29,6 +29,16 @@ io.on('connection', function (socket) {
   socket.on('update', function (data) {
     socket.broadcast.emit('updated', data);
   });
+
+  socket.on('shoot', function (data) {
+    console.log("Shoot");
+    socket.broadcast.emit('shooted', data);
+  });
+
+  socket.on('kill', function (data) {
+    console.log("Kill: " + data);
+    socket.broadcast.emit('killed', data);
+  });
 });
 
 server.listen(80);

@@ -6,9 +6,7 @@ var Q = Quintus({audioSupported: [ 'wav','mp3' ]})
       .include('Sprites, Scenes, Input, 2D, Anim, Touch, UI, Audio')
       .setup({ maximize: true })
       .enableSound()
-      .controls();
-      
-Q.touch(Q.SPRITE_ALL);
+      .controls().touch();
 
 Q.gravityY = 800;
 
@@ -52,6 +50,25 @@ require(objectFiles, function () {
        stage.insert(temp);
      }
     });
+
+    socket.on("killed",function(data) {
+      console.log("Respawning...");
+      player = new Q.Player({playerId: data["playerId"], x: 100, y: 100, socket: socket});
+      console.log(data["playerId"]);
+      stage.insert(player);
+      stage.add('viewport').follow(player);
+    });
+
+    socket.on("shooted", function(data) {
+      console.log(data);
+      stage.insert(
+        new Q.ActorBullet({x: data['x'],
+                      y: data['y'] - 20,
+                      vx: data['dx'] * 1000,
+                      vy: data['dy'] * 1000
+        })
+      );
+    })
   }
 
   Q.scene('arena', function (stage) {
