@@ -1,0 +1,8 @@
+Sprites
+
+Hoofd - 10-10 px
+lichaam - 10-15 px
+
+TOTAAL - 10-25 px
+
+PIXELART
