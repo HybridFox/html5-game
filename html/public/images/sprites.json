@@ -1,1 +1,18 @@
-{"player":{"sx":0,"sy":0,"cols":1,"tilew":240,"tileh":600,"w":24,"h":60,"frames":1}}
+{
+  "player":{
+    "sx":0,
+    "sy":0,
+    "cols":1,
+    "tilew":24,
+    "tileh":60,
+    "frames":1
+  },
+  "weapon":{
+    "sx":24,
+    "sy":0,
+    "cols":1,
+    "tilew":19,
+    "tileh":10,
+    "frames":1
+  }
+}

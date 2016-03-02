@@ -31,12 +31,10 @@ io.on('connection', function (socket) {
   });
 
   socket.on('shoot', function (data) {
-    console.log("Shoot");
     socket.broadcast.emit('shooted', data);
   });
 
   socket.on('kill', function (data) {
-    console.log("Kill: " + data);
     socket.broadcast.emit('killed', data);
   });
 });
