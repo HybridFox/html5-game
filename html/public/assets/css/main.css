@@ -1,0 +1,47 @@
+
+/* ----------------------------------------
+
+    FONTS
+
+---------------------------------------- */
+
+@font-face {
+    font-family: "Proxima Nova";
+    src: url("../fonts/proxima-nova-thin.ttf");
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: "Proxima Nova";
+    src: url("../fonts/proxima-nova-regular.ttf");
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: "Proxima Nova";
+    src: url("../fonts/proxima-nova-semibold.ttf");
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: "Proxima Nova";
+    src: url("../fonts/proxima-nova-bold.ttf");
+    font-weight: 700;
+}
+
+/* ----------------------------------------
+
+  GENERAL STYLES
+
+---------------------------------------- */
+
+.info {
+  z-index: 5;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  text-transform: uppercase;
+  color: #a7a7a7;
+  font-size: .8em;
+  font-weight: 900;
+}

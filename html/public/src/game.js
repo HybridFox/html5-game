@@ -1,5 +1,6 @@
+var playerName = window.prompt("Name?");
 var players = [];
-var socket = io.connect('http://localhost:80');
+var socket = io.connect('http://10.68.252.129:80');
 var UiPlayers = document.getElementById("players");
 
 var Q = Quintus({audioSupported: [ 'wav','mp3' ]})
@@ -8,7 +9,7 @@ var Q = Quintus({audioSupported: [ 'wav','mp3' ]})
       .enableSound()
       .controls().touch();
 
-Q.gravityY = 800;
+Q.gravityY = 500;
 
 Q.input.keyboardControls({
   Z: "up",
@@ -25,14 +26,16 @@ var objectFiles = [
 require(objectFiles, function () {
   function setUp (stage) {
     socket.on('count', function (data) {
-      UiPlayers.innerHTML = 'Players: ' + data['playerCount'];
+      UiPlayers.innerHTML = data['playerCount'];
     });
 
     socket.on('connected', function (data) {
       selfId = data['playerId'];
-      player = new Q.Player({ playerId: selfId, x: 100, y: 100, socket: socket });
+      player = new Q.Player({playerId: selfId, x: 100, y: 100, socket: socket, name: playerName});
       stage.insert(player);
       stage.add('viewport').follow(player);
+      stage.viewport.scale = 1.5;
+      stage.viewport.offsetY = 30;
     });
 
     socket.on('updated', function (data) {
@@ -52,18 +55,17 @@ require(objectFiles, function () {
     });
 
     socket.on("killed",function(data) {
-      console.log("Respawning...");
-      player = new Q.Player({playerId: data["playerId"], x: 100, y: 100, socket: socket});
-      console.log(data["playerId"]);
-      stage.insert(player);
-      stage.add('viewport').follow(player);
+      var actor = players.filter(function (obj) {
+        return obj.playerId == data.playerId;
+      })[0];
+      console.log(actor);
     });
 
     socket.on("shooted", function(data) {
       console.log(data);
       stage.insert(
         new Q.ActorBullet({x: data['x'],
-                      y: data['y'] - 20,
+                      y: data['y'] - 50,
                       vx: data['dx'] * 1000,
                       vy: data['dy'] * 1000
         })
@@ -73,7 +75,6 @@ require(objectFiles, function () {
 
   Q.scene('arena', function (stage) {
     stage.collisionLayer(new Q.TileLayer({ dataAsset: '/maps/arena.json', sheet: 'tiles' }));
-
     setUp(stage);
   });
 

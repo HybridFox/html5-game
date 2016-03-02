@@ -8,12 +8,14 @@ require([], function () {
     init: function (p) {
       this._super(p, {
         sheet: 'player',
+        w: 24,
+        h: 60,
         type: PLAYER
       });
       this.add('2d, platformerControls, animation');
     },
     step: function (dt) {
-      socket.emit('update', { playerId: this.p.playerId, x: this.p.x, y: this.p.y, sheet: this.p.sheet });
+      socket.emit('update', { playerId: this.p.playerId, x: this.p.x, y: this.p.y, sheet: this.p.sheet, name: this.p.playerName});
     }
   });
 
@@ -31,13 +33,14 @@ require([], function () {
     var dy = Math.sin(deg * Math.PI / 180),
         dx = Math.cos(deg * Math.PI / 180);
 
-    socket.emit('shoot', { playerId: player.p.playerId, x: player.p.x, y: player.p.y, dx: dx, dy: dy});
+    socket.emit('shoot', { playerId: player.p.playerId, x: player.p.x, y: player.p.y, dx: dx, dy: dy, deg: deg});
 
     stage.insert(
       new Q.Bullet({x: player.p.x,
-                    y: player.p.y - 20,
+                    y: player.p.y - 50,
                     vx: dx * 1000,
-                    vy: dy * 1000
+                    vy: dy * 1000,
+                    omega: deg
       })
     );
   });
@@ -46,7 +49,9 @@ require([], function () {
     init: function (p) {
       this._super(p, {
         update: true,
-        type: ACTOR
+        type: ACTOR,
+        w: 24,
+        h: 60
       });
 
       var temp = this;
@@ -62,8 +67,8 @@ require([], function () {
   Q.Sprite.extend("Bullet",{
     init: function(p) {
       this._super(p,{
-        w:2,
-        h:2,
+        w:10,
+        h:4,
         type: BULLET
       });
       this.add("2d");
@@ -77,7 +82,6 @@ require([], function () {
 
       } else if (col.obj.p.type == ACTOR) {
         console.log("Killed Someone");
-        col.obj.destroy();
         socket.emit('kill', {playerId: col.obj.p.playerId});
       } else {
         this.destroy();
@@ -93,8 +97,8 @@ require([], function () {
   Q.Sprite.extend("ActorBullet",{
     init: function(p) {
       this._super(p,{
-        w:2,
-        h:2,
+        w:10,
+        h:4,
         type: BULLET
       });
       this.add("2d");
@@ -105,11 +109,10 @@ require([], function () {
       if (col.obj.p.type == PLAYER) {
         console.log("Got Killed");
         this.destroy();
-        col.obj.destroy();
       } else if (col.obj.p.type == BULLET) {
 
       } else if (col.obj.p.type == ACTOR) {
-        col.obj.destroy();
+        // col.obj.destroy();
       } else {
         this.destroy();
       }
