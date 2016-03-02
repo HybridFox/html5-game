@@ -3212,16 +3212,16 @@ Quintus.Input = function(Q) {
                     Z: 90, X: 88   
                   };
   
-  var DEFAULT_KEYS = { LEFT: 'left', RIGHT: 'right',
-                       UP: 'up',     DOWN: 'down',
+  var DEFAULT_KEYS = { Q : 'left', D: 'right',
+                       Z: 'up',     S: 'down',
                        SPACE: 'fire',
                        Z: 'fire',
                        X: 'action' };
 
-  var DEFAULT_TOUCH_CONTROLS  = [ ['left','<' ],
-                            ['right','>' ],
+  var DEFAULT_TOUCH_CONTROLS  = [ ['left','<-' ],
+                            ['right','->' ],
                             [],
-                            ['action','b'],
+                            ['action','jump'],
                             ['fire', 'a' ]];
 
   // Clockwise from midnight (a la CSS)
@@ -3908,7 +3908,7 @@ Quintus.Input = function(Q) {
   Q.component("platformerControls", {
     defaults: {
       speed: 300,
-      jumpSpeed: -600,
+      jumpSpeed: -400,
       collisions: []
     },
 
