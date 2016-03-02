@@ -3207,13 +3207,13 @@ Quintus.Input = function(Q) {
    * @type Object
    * @static
    */
-  var KEY_NAMES = Q.KEY_NAMES = { LEFT: 37, RIGHT: 39, SPACE: 32,
-                    UP: 38, DOWN: 40,
-                    Z: 90, X: 88   
+  var KEY_NAMES = Q.KEY_NAMES = { LEFT: 81, RIGHT: 68, SPACE: 32,
+                    UP: 90, DOWN: 83,
+                    Z: 80, X: 88   
                   };
   
-  var DEFAULT_KEYS = { Q : 'left', D: 'right',
-                       Z: 'up',     S: 'down',
+  var DEFAULT_KEYS = { LEFT : 'left', RIGHT: 'right',
+                       UP: 'up',     DOWN: 'down',
                        SPACE: 'fire',
                        Z: 'fire',
                        X: 'action' };
