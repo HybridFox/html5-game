@@ -14,5 +14,13 @@
     "tilew":19,
     "tileh":10,
     "frames":1
+  },
+  "bullet":{
+    "sx":24,
+    "sy":10,
+    "cols":1,
+    "tilew":10,
+    "tileh":4,
+    "frames":1
   }
 }

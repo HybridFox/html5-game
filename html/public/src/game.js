@@ -117,7 +117,7 @@ require(objectFiles, function () {
   ];
 
   Q.load(files.join(','), function () {
-    Q.sheet('tiles', '/images/tiles.png', { tilew: 32, tileh: 32 });
+    Q.sheet('tiles', '/images/tiles.png', { tilew: 48, tileh: 48 });
     Q.compileSheets('/images/sprites.png', '/images/sprites.json');
     Q.stageScene('arena', 0);
   });
