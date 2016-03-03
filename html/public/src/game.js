@@ -6,6 +6,7 @@ var socket = io.connect('http://10.68.252.129:80');
 var UiPlayers = document.getElementById("players");
 var UiLives = document.getElementById("lives");
 var UiKillfeed = document.getElementById("killfeed");
+var stage;
 
 var Q = Quintus({audioSupported: [ 'wav','mp3' ]})
       .include('Sprites, Scenes, Input, 2D, Anim, Touch, UI, Audio')
@@ -35,7 +36,7 @@ require(objectFiles, function () {
               if (playerName == "") {
                   proceed = false;
               } else {
-                proceed=true;
+                proceed = true;
               }
           }
           if (playerName === null) {
@@ -86,6 +87,7 @@ require(objectFiles, function () {
        actor.player.p.x = data['x'];
        actor.player.p.y = data['y'];
        actor.player.p.sheet = data['sheet'];
+       actor.player.p.opacity = data['opacity'];
        actor.player.p.update = true;
        if (data['deg'] < -90 || data['deg'] > 90) {
          actor.player.p.flip = "x";
@@ -117,18 +119,22 @@ require(objectFiles, function () {
       if (self_player.p.playerId == data["playerId"]) {
         self_player.p.lives--;
         if (self_player.p.lives == 0) {
-          UiKillfeed.innerHTML = "<div class='killfeed-log'>" + data["hitByName"] + " <span>Killed</span> " + self_player.p.p_name + "</div>";
+          $("<div class='killfeed-log'>" + data["hitByName"] + " <span>Killed</span> " + self_player.p.p_name + "</div>").prependTo(UiKillfeed).delay(5000).fadeOut();
           socket.emit("addtokillfeed", {killed: self_player.p.p_name, killedBy: data["hitByName"]});
           self_player.p.x = 100;
           self_player.p.y = 100;
           self_player.p.lives = 10;
+          self_player.p.opacity = 0.5;
+          setTimeout(function() {
+            self_player.p.opacity = 1;
+          }, 10000)
           console.log("RIP");
         }
       }
     });
 
     socket.on("appendkillfeed", function(data) {
-      UiKillfeed.innerHTML = "<div class='killfeed-log'>" + data["killedBy"] + " <span>Killed</span> " + data["killed"] + "</div>";
+      $("<div class='killfeed-log'>" + data["killedBy"] + " <span>Killed</span> " + data["killed"] + "</div>").prependTo(UiKillfeed).delay(5000).fadeOut();
     });
 
     socket.on("shooted", function(data) {

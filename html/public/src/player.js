@@ -2,9 +2,11 @@ require([], function () {
 
   var global_deg = 0;
 
+  Q.NONE = 1;
   Q.BULLET = 15;
   Q.PLAYER = 16;
   Q.ACTOR = 17;
+  Q.PARTICLE = 18;
   Q.NOTHING = 999;
 
   Q.Sprite.extend('Player', {
@@ -24,7 +26,7 @@ require([], function () {
       } else {
         this.p.flip = "";
       }
-      socket.emit('update', { playerId: this.p.playerId, x: this.p.x, y: this.p.y, sheet: this.p.sheet, name: this.p.p_name, deg: global_deg});
+      socket.emit('update', { playerId: this.p.playerId, x: this.p.x, y: this.p.y, sheet: this.p.sheet, name: this.p.p_name, deg: global_deg, opacity: this.p.opacity});
     }
   });
 
@@ -89,16 +91,18 @@ require([], function () {
     var dy = Math.sin(deg * Math.PI / 180),
         dx = Math.cos(deg * Math.PI / 180);
 
-    socket.emit('shoot', { playerId: player.p.playerId, x: player.p.x, y: player.p.y, dx: dx, dy: dy, deg: deg});
+    if (player.p.opacity == 1) {
+      socket.emit('shoot', { playerId: player.p.playerId, x: player.p.x, y: player.p.y, dx: dx, dy: dy, deg: deg});
 
-    stage.insert(
-      new Q.Bullet({x: player.p.x + dx * 20,
-                    y: player.p.y + dy * 20,
-                    vx: dx * 1000,
-                    vy: dy * 1000,
-                    angle: global_deg
-      })
-    );
+      stage.insert(
+        new Q.Bullet({x: player.p.x + dx * 20,
+                      y: player.p.y + dy * 20,
+                      vx: dx * 1000,
+                      vy: dy * 1000,
+                      angle: global_deg
+        })
+      );
+    }
   });
 
   Q.el.addEventListener('mousemove', function(e) {
@@ -151,7 +155,50 @@ require([], function () {
     },
   });
 
+  Q.Sprite.extend("Particle",{
+    init: function(p) {
+      this._super(p,{
+        w: 2,
+        h: 2,
+        type: Q.PARTICLE,
+        color: "#000"
+      });
+      this.add("2d");
+      this.on("hit",this,"collision");
+    },
 
+    collision: function(col) {
+      if (col.obj.p.type == Q.PLAYER) {
+        this.destroy();
+      } else if (col.obj.p.type == Q.BULLET) {
+        this.destroy();
+      } else if (col.obj.p.type == Q.ACTOR) {
+        this.destroy();
+      } else {
+        this.destroy();
+      }
+    },
+
+    draw: function(ctx) {
+      ctx.fillStyle = this.p.color;
+      ctx.fillRect(-this.p.cx,-this.p.cy,this.p.w,this.p.h);
+    },
+  });
+
+  function createParticles(x, y, amount, color) {
+    for (var i = 0; i < amount; i++) {
+      var stage = Q.stage();
+
+      var deg = Math.floor(Math.random() * 180) + 1;
+
+      var dy = Math.sin(deg * Math.PI / 180) * Math.floor(Math.random() * 400) + 100,
+          dx = Math.cos(deg * Math.PI / 180) * Math.floor(Math.random() * 400) + 100;
+
+      console.log(dy);
+
+      stage.insert(new Q.Particle({x: x, y: y, vy: dy, vx: dx, color: color}));
+    }
+  }
 
   Q.Sprite.extend("Bullet",{
     init: function(p) {
@@ -171,10 +218,14 @@ require([], function () {
       } else if (col.obj.p.type == Q.BULLET) {
 
       } else if (col.obj.p.type == Q.ACTOR) {
-        this.destroy()
-        var self_player = Q("Player").first();
-        socket.emit('kill', {playerId: col.obj.p.playerId, hitByName: self_player.p.p_name});
+        this.destroy();
+        if (col.obj.p.opacity == 1) {
+          createParticles(this.p.x, this.p.y, 3, "#F00");
+          var self_player = Q("Player").first();
+          socket.emit('kill', {playerId: col.obj.p.playerId, hitByName: self_player.p.p_name});
+        }
       } else {
+        createParticles(this.p.x, this.p.y, 3, "#000");
         this.destroy();
       }
     },
@@ -199,12 +250,16 @@ require([], function () {
 
     collision: function(col) {
       if (col.obj.p.type == Q.PLAYER) {
-        this.destroy();
+        if (col.obj.p.opacity == 1) {
+          this.destroy();
+          createParticles(this.p.x, this.p.y, 3, "#F00");
+        }
       } else if (col.obj.p.type == Q.BULLET) {
 
       } else if (col.obj.p.type == Q.ACTOR) {
         this.destroy();
       } else {
+        createParticles(this.p.x, this.p.y, 3, "#000");
         this.destroy();
       }
     },
