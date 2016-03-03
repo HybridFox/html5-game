@@ -2,11 +2,11 @@
 var players = [];
 var labels = [];
 var weapons = [];
-var socket = io.connect('http://10.68.252.129:80');
+var socket = io.connect('http://localhost:80');
 var UiPlayers = document.getElementById("players");
 var UiLives = document.getElementById("lives");
 var UiKillfeed = document.getElementById("killfeed");
-var stage;
+var playerName = "Joining...";
 
 var Q = Quintus({audioSupported: [ 'wav','mp3' ]})
       .include('Sprites, Scenes, Input, 2D, Anim, Touch, UI, Audio')
@@ -22,14 +22,14 @@ var objectFiles = [
 
 require(objectFiles, function () {
   function setUp (stage) {
+    console.log("Setting up stage");
     socket.on('count', function (data) {
       UiPlayers.innerHTML = data['playerCount'];
     });
 
     socket.on('connected', function (data) {
-      proceed = false;
       selfId = data['playerId'];
-      while(!proceed) {
+      /* while(!proceed) {
           var playerName = window.prompt("Name?");
           if (typeof(playerName) == "string") {
               playerName = playerName.trim();
@@ -42,7 +42,7 @@ require(objectFiles, function () {
           if (playerName === null) {
               proceed = false;
           }
-      }
+      } */
       player = new Q.Player({playerId: selfId, x: 100, y: 100, socket: socket, p_name: playerName});
       weapon = new Q.Weapon({playerId: selfId, x: 100, y: 100});
       stage.insert(player);
@@ -71,6 +71,7 @@ require(objectFiles, function () {
        label.label.p.x = data['x'];
        label.label.p.y = data['y'] - 40;
        label.label.p.update = true;
+       label.label.p.label = data["name"];
      }
      if (weapon) {
        weapon.weapon.p.x = data['x'];
@@ -103,6 +104,7 @@ require(objectFiles, function () {
        console.log("Adding Weapon");
        weapons.push({weapon: temp_weapon, playerId: data['playerId']});
        stage.insert(temp);
+       console.log(temp_label)
        stage.insert(temp_label);
        stage.insert(temp_weapon);
      }
@@ -127,7 +129,7 @@ require(objectFiles, function () {
           self_player.p.opacity = 0.5;
           setTimeout(function() {
             self_player.p.opacity = 1;
-          }, 10000)
+          }, 5000)
           console.log("RIP");
         }
       }
@@ -149,6 +151,25 @@ require(objectFiles, function () {
     })
   }
 
+
+
+  $(".play-btn").on("click", function() {
+    if ($("#azerty").checked) {
+      var keyboardLayout = "azerty";
+    } else if ($("#qwerty").checked) {
+      var keyboardLayout = "qwerty";
+    } else {
+
+    }
+    if ($("#username").val() != "") {
+      console.log("Setting username: " + $("#username").val());
+      var player = Q("Player").first();
+      player.p.p_name = $("#username").val();
+    }
+    $(".menu").fadeOut();
+    console.log("Starting stage setup");
+  });
+
   Q.scene('arena', function (stage) {
     stage.collisionLayer(new Q.TileLayer({ dataAsset: '/maps/arena.json', sheet: 'tiles' }));
     setUp(stage);
@@ -166,4 +187,22 @@ require(objectFiles, function () {
     Q.compileSheets('/images/sprites.png', '/images/sprites.json');
     Q.stageScene('arena', 0);
   });
+
+  function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + "; " + expires;
+  }
+
+  function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+    }
+    return "";
+  }
 });

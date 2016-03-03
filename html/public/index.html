@@ -2,9 +2,10 @@
   <head>
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="lib/quintus-all.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
     <script src="socket.io/socket.io.js"></script>
-    <script src="node_modules\alertify.js\src\js\alertify.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/normalize.css">
     <link rel="stylesheet" href="assets/css/main.css">
   </head>
@@ -12,6 +13,26 @@
     <div class="info">Alpha 0.0.6 - Players:<span id="players" class="players"></span></div>
     <div class="lives" id="lives"></div>
     <div class="killfeed" id="killfeed"></div>
+    <div class="menu">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <div class="form-group">
+            <input type="text" name="name" id="username" class="form-control" placeholder="username">
+          </div>
+          <div class="btn-group" data-toggle="buttons">
+            <label class="btn btn-default">
+              <input type="radio" name="keyboard-layout" id="azerty" autocomplete="off"> AZERTY
+            </label>
+            <label class="btn btn-default">
+              <input type="radio" name="keyboard-layout" id="qwerty" autocomplete="off"> QWERTY
+            </label>
+          </div>
+          <div class="btn-group pull-right">
+            <input type="button" name="play" value="Play!" class="btn btn-primary play-btn">
+          </div>
+        </div>
+      </div>
+    </div>
     <script src="/lib/require.min.js"></script>
     <script src="src/game.js"></script>
   </body>
