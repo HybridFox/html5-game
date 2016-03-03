@@ -10,6 +10,7 @@ require([], function () {
   Q.Sprite.extend('Player', {
     init: function (p) {
       this._super(p, {
+        lives: 10,
         sheet: 'player',
         w: 24,
         h: 60,
@@ -171,7 +172,8 @@ require([], function () {
 
       } else if (col.obj.p.type == Q.ACTOR) {
         this.destroy()
-        socket.emit('kill', {playerId: col.obj.p.playerId});
+        var self_player = Q("Player").first();
+        socket.emit('kill', {playerId: col.obj.p.playerId, hitByName: self_player.p.p_name});
       } else {
         this.destroy();
       }

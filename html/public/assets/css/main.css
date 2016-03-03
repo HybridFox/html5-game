@@ -45,3 +45,37 @@
   font-size: .8em;
   font-weight: 900;
 }
+
+.lives {
+  z-index: 5;
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  text-transform: uppercase;
+  color: #a7a7a7;
+  font-size: .8em;
+  font-weight: 900;
+}
+
+.killfeed {
+  z-index: 5;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  text-transform: uppercase;
+  color: #212121;
+  font-size: .8em;
+  font-weight: 900;
+}
+
+.killfeed-log span {
+  color: #585858;
+  font-size: .8em;
+  font-weight: 400;
+}
+
+.lives i {
+  color: red;
+  margin-right: 5px;
+  font-size: 1.5em;
+}

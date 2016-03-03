@@ -2,8 +2,10 @@
 var players = [];
 var labels = [];
 var weapons = [];
-var socket = io.connect('http://localhost:80');
+var socket = io.connect('http://10.68.252.129:80');
 var UiPlayers = document.getElementById("players");
+var UiLives = document.getElementById("lives");
+var UiKillfeed = document.getElementById("killfeed");
 
 var Q = Quintus({audioSupported: [ 'wav','mp3' ]})
       .include('Sprites, Scenes, Input, 2D, Anim, Touch, UI, Audio')
@@ -24,8 +26,22 @@ require(objectFiles, function () {
     });
 
     socket.on('connected', function (data) {
+      proceed = false;
       selfId = data['playerId'];
-      var playerName = window.prompt("Name?");
+      while(!proceed) {
+          var playerName = window.prompt("Name?");
+          if (typeof(playerName) == "string") {
+              playerName = playerName.trim();
+              if (playerName == "") {
+                  proceed = false;
+              } else {
+                proceed=true;
+              }
+          }
+          if (playerName === null) {
+              proceed = false;
+          }
+      }
       player = new Q.Player({playerId: selfId, x: 100, y: 100, socket: socket, p_name: playerName});
       weapon = new Q.Weapon({playerId: selfId, x: 100, y: 100});
       stage.insert(player);
@@ -33,6 +49,11 @@ require(objectFiles, function () {
       stage.add('viewport').follow(player);
       stage.viewport.scale = 1.5;
       stage.viewport.offsetY = 30;
+      var lives = "";
+      for (var i = 0; i < player.p.lives; i++) {
+        lives += "<i class='fa fa-heart'></i>";
+      }
+      UiLives.innerHTML = lives;
     });
 
     socket.on('updated', function (data) {
@@ -86,10 +107,28 @@ require(objectFiles, function () {
 
     });
 
-    socket.on("killed",function(data) {
-      var actor = players.filter(function (obj) {
-        return obj.playerId == data.playerId;
-      })[0];
+    socket.on("killed", function(data) {
+      var self_player = Q("Player").first();
+      var lives = "";
+      for (var i = 0; i < self_player.p.lives; i++) {
+        lives += "<i class='fa fa-heart'></i>";
+      }
+      UiLives.innerHTML = lives;
+      if (self_player.p.playerId == data["playerId"]) {
+        self_player.p.lives--;
+        if (self_player.p.lives == 0) {
+          UiKillfeed.innerHTML = "<div class='killfeed-log'>" + data["hitByName"] + " <span>Killed</span> " + self_player.p.p_name + "</div>";
+          socket.emit("addtokillfeed", {killed: self_player.p.p_name, killedBy: data["hitByName"]});
+          self_player.p.x = 100;
+          self_player.p.y = 100;
+          self_player.p.lives = 10;
+          console.log("RIP");
+        }
+      }
+    });
+
+    socket.on("appendkillfeed", function(data) {
+      UiKillfeed.innerHTML = "<div class='killfeed-log'>" + data["killedBy"] + " <span>Killed</span> " + data["killed"] + "</div>";
     });
 
     socket.on("shooted", function(data) {
@@ -117,7 +156,7 @@ require(objectFiles, function () {
   ];
 
   Q.load(files.join(','), function () {
-    Q.sheet('tiles', '/images/tiles.png', { tilew: 48, tileh: 48 });
+    Q.sheet('tiles', '/images/tiles.png', { tilew: 32, tileh: 32 });
     Q.compileSheets('/images/sprites.png', '/images/sprites.json');
     Q.stageScene('arena', 0);
   });

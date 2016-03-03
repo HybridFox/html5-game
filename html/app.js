@@ -34,6 +34,10 @@ io.on('connection', function (socket) {
     socket.broadcast.emit('shooted', data);
   });
 
+  socket.on('addtokillfeed', function (data) {
+    socket.broadcast.emit('appendkillfeed', data);
+  });
+
   socket.on('kill', function (data) {
     socket.broadcast.emit('killed', data);
   });
