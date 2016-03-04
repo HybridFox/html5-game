@@ -3218,10 +3218,10 @@ Quintus.Input = function(Q) {
                        Z: 'fire',
                        X: 'action' };
 
-  var DEFAULT_TOUCH_CONTROLS  = [ ['left','pijllinks.png' ],
-                            ['right','pijlrechts.png' ],
+  var DEFAULT_TOUCH_CONTROLS  = [ ['left','images/pijllinks.png' ],
+                            ['right','images/pijlrechts.png' ],
                             [],
-                            ['action','jump'],
+                            ['action','^'],
                             ['fire', 'a' ]];
 
   // Clockwise from midnight (a la CSS)
