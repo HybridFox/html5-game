@@ -17,6 +17,8 @@ require([], function () {
         w: 24,
         h: 60,
         type: Q.PLAYER,
+        kills: 0,
+        deaths: 0
       });
       this.add('2d, platformerControls, animation');
     },
@@ -26,7 +28,7 @@ require([], function () {
       } else {
         this.p.flip = "";
       }
-      socket.emit('update', { playerId: this.p.playerId, x: this.p.x, y: this.p.y, sheet: this.p.sheet, name: this.p.p_name, deg: global_deg, opacity: this.p.opacity});
+      socket.emit('update', { playerId: this.p.playerId, x: this.p.x, y: this.p.y, sheet: this.p.sheet, name: this.p.p_name, deg: global_deg, opacity: this.p.opacity, kills: this.p.kills, deaths: this.p.deaths});
     }
   });
 
@@ -78,6 +80,40 @@ require([], function () {
     }
   });
 
+  Q.el.addEventListener('keydown', function(e) {
+    if (keysdown[e.keyCode]) {
+      return;
+    }
+
+    keysdown[e.keyCode] = true;
+
+    switch(e.keyCode){
+      case 9:
+        var actors = Q("Actor");
+        var self = Q("Player").first();
+        var html = "";
+        html += "<tr><td>" + self.p.p_name + "</td><td>" + self.p.kills + "</td><td>" + self.p.deaths + "</td></tr>";
+        for (var key in actors.items) {
+          var deaths = actors.items[key].p.deaths;
+          var kills = actors.items[key].p.kills;
+          console.log(actors.items[key].p);
+          html += "<tr><td>" + actors.items[key].p.p_name + "</td><td>" + actors.items[key].p.kills + "</td><td>" + actors.items[key].p.deaths + "</td></tr>";
+        }
+        $(".player-board").html(html);
+        $(".scoreboard").fadeIn(100);
+        break;
+    }
+  });
+
+  Q.el.addEventListener('keyup', function(e) {
+    delete keysdown[e.keyCode];
+    switch(e.keyCode){
+      case 9:
+      $(".scoreboard").fadeOut(100);
+        break;
+    }
+  });
+
   Q.el.addEventListener('click', function(e) {
     var player = Q("Player").first();
     var weapon = Q("Weapon").first();
@@ -106,7 +142,6 @@ require([], function () {
           })
         );
         clicked = true;
-        console.log(weapon);
         setTimeout(function(){ clicked = false; }, weapon.p.shootTimeout);
       }
     }
@@ -131,7 +166,8 @@ require([], function () {
         update: true,
         type: Q.ACTOR,
         w: 24,
-        h: 60
+        h: 60,
+        p_name: "Joining..."
       });
 
       var temp = this;
@@ -200,8 +236,6 @@ require([], function () {
 
       var dy = Math.sin(deg * Math.PI / 180) * Math.floor(Math.random() * 400) + 100,
           dx = Math.cos(deg * Math.PI / 180) * Math.floor(Math.random() * 400) + 100;
-
-      console.log(dy);
 
       stage.insert(new Q.Particle({x: x, y: y, vy: dy, vx: dx, color: color}));
     }

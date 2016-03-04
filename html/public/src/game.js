@@ -2,19 +2,22 @@
 var players = [];
 var labels = [];
 var weapons = [];
+var keysdown = [];
 var socket = io.connect('http://10.68.246.11:80');
 var UiPlayers = document.getElementById("players");
 var UiLives = document.getElementById("lives");
 var UiKillfeed = document.getElementById("killfeed");
 var playerName = "Joining...";
 var clicked = false;
+var startTime;
+
+
 
 var Q = Quintus({audioSupported: [ 'wav','mp3' ]})
       .include('Sprites, Scenes, Input, 2D, Anim, Touch, UI, Audio')
       .setup({ maximize: true })
       .enableSound()
       .controls().touch();
-
 
 
 var objectFiles = [
@@ -24,26 +27,13 @@ var objectFiles = [
 require(objectFiles, function () {
   function setUp (stage) {
     console.log("Setting up stage");
+
     socket.on('count', function (data) {
       UiPlayers.innerHTML = data['playerCount'];
     });
 
     socket.on('connected', function (data) {
       selfId = data['playerId'];
-      /* while(!proceed) {
-          var playerName = window.prompt("Name?");
-          if (typeof(playerName) == "string") {
-              playerName = playerName.trim();
-              if (playerName == "") {
-                  proceed = false;
-              } else {
-                proceed = true;
-              }
-          }
-          if (playerName === null) {
-              proceed = false;
-          }
-      } */
       player = new Q.Player({playerId: selfId, x: 100, y: 100, socket: socket, p_name: playerName});
       weapon = new Q.Weapon({playerId: selfId, x: 100, y: 100});
       stage.insert(player);
@@ -88,6 +78,9 @@ require(objectFiles, function () {
      if (actor) {
        actor.player.p.x = data['x'];
        actor.player.p.y = data['y'];
+       actor.player.p.kills = data['kills'];
+       actor.player.p.deaths = data['deaths'];
+       actor.player.p.p_name = data['name'];
        actor.player.p.sheet = data['sheet'];
        actor.player.p.opacity = data['opacity'];
        actor.player.p.update = true;
@@ -102,10 +95,8 @@ require(objectFiles, function () {
        var temp_weapon = new Q.ActorWeapon({playerId: data['playerId'], x: data['x'], y: data['y']});
        players.push({player: temp, playerId: data['playerId']});
        labels.push({label: temp_label, playerId: data['playerId']});
-       console.log("Adding Weapon");
        weapons.push({weapon: temp_weapon, playerId: data['playerId']});
        stage.insert(temp);
-       console.log(temp_label)
        stage.insert(temp_label);
        stage.insert(temp_weapon);
      }
@@ -122,6 +113,7 @@ require(objectFiles, function () {
       if (self_player.p.playerId == data["playerId"]) {
         self_player.p.lives--;
         if (self_player.p.lives == 0) {
+          self_player.p.deaths++;
           $("<div class='killfeed-log'>" + data["hitByName"] + " <span>Killed</span> " + self_player.p.p_name + "</div>").prependTo(UiKillfeed).delay(5000).fadeOut();
           socket.emit("addtokillfeed", {killed: self_player.p.p_name, killedBy: data["hitByName"]});
           self_player.p.x = 100;
@@ -131,7 +123,6 @@ require(objectFiles, function () {
           setTimeout(function() {
             self_player.p.opacity = 1;
           }, 5000)
-          console.log("RIP");
         }
       }
     });
@@ -163,7 +154,6 @@ require(objectFiles, function () {
 
     }
     if ($("#username").val() != "") {
-      console.log("Setting username: " + $("#username").val());
       var player = Q("Player").first();
       player.p.p_name = $("#username").val();
       $(".menu").fadeOut();
