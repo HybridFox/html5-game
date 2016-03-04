@@ -9,6 +9,14 @@ require([], function () {
   Q.PARTICLE = 18;
   Q.NOTHING = 999;
 
+  // -------------------------------------------
+  //  Type: Sprite
+  //  Name: Player
+  //  Description: Own character
+  //
+  //
+  // -----
+
   Q.Sprite.extend('Player', {
     init: function (p) {
       this._super(p, {
@@ -31,6 +39,42 @@ require([], function () {
       socket.emit('update', { playerId: this.p.playerId, x: this.p.x, y: this.p.y, sheet: this.p.sheet, name: this.p.p_name, deg: global_deg, opacity: this.p.opacity, kills: this.p.kills, deaths: this.p.deaths});
     }
   });
+
+  // -------------------------------------------
+  //  Type: Sprite
+  //  Name: Actor
+  //  Description: Other players
+  //
+  //
+  // -----
+
+  Q.Sprite.extend('Actor', {
+    init: function (p) {
+      this._super(p, {
+        update: true,
+        type: Q.ACTOR,
+        w: 24,
+        h: 60,
+        p_name: "Joining..."
+      });
+
+      var temp = this;
+      setInterval(function () {
+        if (!temp.p.update) {
+          temp.destroy();
+        }
+        temp.p.update = false;
+      }, 3000);
+    }
+  });
+
+  // -------------------------------------------
+  //  Type: Sprite
+  //  Name: Weapon
+  //  Description: Own Weapon
+  //
+  //
+  // -----
 
   Q.Sprite.extend('Weapon', {
     init: function (p) {
@@ -58,6 +102,14 @@ require([], function () {
     }
   });
 
+  // -------------------------------------------
+  //  Type: Sprite
+  //  Name: ActorWeapon
+  //  Description: Other people's Weapon
+  //
+  //
+  // -----
+
   Q.Sprite.extend('ActorWeapon', {
     init: function (p) {
       this._super(p, {
@@ -80,123 +132,13 @@ require([], function () {
     }
   });
 
-  Q.el.addEventListener('keydown', function(e) {
-    if (keysdown[e.keyCode]) {
-      return;
-    }
-
-    keysdown[e.keyCode] = true;
-
-    switch(e.keyCode){
-      case 9:
-        var actors = Q("Actor");
-        var self = Q("Player").first();
-        var html = "";
-        html += "<tr><td>" + self.p.p_name + "</td><td>" + self.p.kills + "</td><td>" + self.p.deaths + "</td></tr>";
-        for (var key in actors.items) {
-          var deaths = actors.items[key].p.deaths;
-          var kills = actors.items[key].p.kills;
-          console.log(actors.items[key].p);
-          html += "<tr><td>" + actors.items[key].p.p_name + "</td><td>" + actors.items[key].p.kills + "</td><td>" + actors.items[key].p.deaths + "</td></tr>";
-        }
-        $(".player-board").html(html);
-        $(".scoreboard").fadeIn(100);
-        break;
-    }
-  });
-
-  Q.el.addEventListener('keyup', function(e) {
-    delete keysdown[e.keyCode];
-    switch(e.keyCode){
-      case 9:
-      $(".scoreboard").fadeOut(100);
-        break;
-    }
-  });
-
-  Q.el.addEventListener('click', function(e) {
-    var player = Q("Player").first();
-    var weapon = Q("Weapon").first();
-    var x = e.offsetX || e.layerX,
-      y = e.offsetY || e.layerY,
-      stage = Q.stage();
-
-    var stageX = Q.canvasToStageX(x, stage),
-        stageY = Q.canvasToStageY(y, stage);
-
-    var deg = Math.atan2(stageY - player.p.y, stageX - player.p.x) * 180 / Math.PI;
-
-    var dy = Math.sin(deg * Math.PI / 180),
-        dx = Math.cos(deg * Math.PI / 180);
-
-    if (!clicked) {
-      if (player.p.opacity == 1) {
-        socket.emit('shoot', { playerId: player.p.playerId, x: player.p.x, y: player.p.y, dx: dx, dy: dy, deg: deg});
-
-        stage.insert(
-          new Q.Bullet({x: player.p.x + dx * 20,
-                        y: player.p.y + dy * 20,
-                        vx: dx * 1000,
-                        vy: dy * 1000,
-                        angle: global_deg
-          })
-        );
-        clicked = true;
-        setTimeout(function(){ clicked = false; }, weapon.p.shootTimeout);
-      }
-    }
-  });
-
-  Q.el.addEventListener('mousemove', function(e) {
-    var player = Q("Player").first();
-
-    var x = e.offsetX || e.layerX,
-        y = e.offsetY || e.layerY,
-        stage = Q.stage();
-
-    var stageX = Q.canvasToStageX(x, stage),
-        stageY = Q.canvasToStageY(y, stage);
-
-    global_deg = Math.atan2(stageY - player.p.y, stageX - player.p.x) * 180 / Math.PI;
-  });
-
-  Q.Sprite.extend('Actor', {
-    init: function (p) {
-      this._super(p, {
-        update: true,
-        type: Q.ACTOR,
-        w: 24,
-        h: 60,
-        p_name: "Joining..."
-      });
-
-      var temp = this;
-      setInterval(function () {
-        if (!temp.p.update) {
-          temp.destroy();
-        }
-        temp.p.update = false;
-      }, 3000);
-    }
-  });
-
-
-  Q.UI.Text.extend("labelText", {
-    init: function(p) {
-      this._super(p,{
-        update: true,
-        scale: 0.4
-      });
-
-      var temp = this;
-      setInterval(function () {
-        if (!temp.p.update) {
-          temp.destroy();
-        }
-        temp.p.update = false;
-      }, 3000);
-    },
-  });
+  // -------------------------------------------
+  //  Type: Sprite
+  //  Name: Particle
+  //  Description: Provides names on top of players
+  //
+  //
+  // -----
 
   Q.Sprite.extend("Particle",{
     init: function(p) {
@@ -228,18 +170,13 @@ require([], function () {
     },
   });
 
-  function createParticles(x, y, amount, color) {
-    for (var i = 0; i < amount; i++) {
-      var stage = Q.stage();
-
-      var deg = Math.floor(Math.random() * 180) + 1;
-
-      var dy = Math.sin(deg * Math.PI / 180) * Math.floor(Math.random() * 400) + 100,
-          dx = Math.cos(deg * Math.PI / 180) * Math.floor(Math.random() * 400) + 100;
-
-      stage.insert(new Q.Particle({x: x, y: y, vy: dy, vx: dx, color: color}));
-    }
-  }
+  // -------------------------------------------
+  //  Type: Sprite
+  //  Name: Bullet
+  //  Description: Own bullet
+  //
+  //
+  // -----
 
   Q.Sprite.extend("Bullet",{
     init: function(p) {
@@ -284,6 +221,14 @@ require([], function () {
     },
   });
 
+  // -------------------------------------------
+  //  Type: Sprite
+  //  Name: ActorBullet
+  //  Description: Other bullets
+  //
+  //
+  // -----
+
   Q.Sprite.extend("ActorBullet",{
     init: function(p) {
       this._super(p,{
@@ -324,4 +269,147 @@ require([], function () {
       ctx.fillRect(-this.p.cx,-this.p.cy,this.p.w,this.p.h);
     },
   });
+
+  // -------------------------------------------
+  //  Type: UI - Text
+  //  Name: labelText
+  //  Description: Provides names on top of players
+  //
+  //
+  // -----
+
+  Q.UI.Text.extend("labelText", {
+    init: function(p) {
+      this._super(p,{
+        update: true,
+        scale: 0.4
+      });
+
+      var temp = this;
+      setInterval(function () {
+        if (!temp.p.update) {
+          temp.destroy();
+        }
+        temp.p.update = false;
+      }, 3000);
+    },
+  });
+
+  // -------------------------------------------
+  //  Type: Event Listener
+  //  Name: keydown
+  //  Description: Handles keydown presses
+  // -----
+
+  Q.el.addEventListener('keydown', function(e) {
+    if (keysdown[e.keyCode]) {
+      return;
+    }
+
+    keysdown[e.keyCode] = true;
+
+    switch(e.keyCode){
+      case 9:
+        var actors = Q("Actor");
+        var self = Q("Player").first();
+        var html = "";
+        html += "<tr><td>" + self.p.p_name + "</td><td>" + self.p.kills + "</td><td>" + self.p.deaths + "</td></tr>";
+        for (var key in actors.items) {
+          var deaths = actors.items[key].p.deaths;
+          var kills = actors.items[key].p.kills;
+          console.log(actors.items[key].p);
+          html += "<tr><td>" + actors.items[key].p.p_name + "</td><td>" + actors.items[key].p.kills + "</td><td>" + actors.items[key].p.deaths + "</td></tr>";
+        }
+        $(".player-board").html(html);
+        $(".scoreboard").fadeIn(100);
+        break;
+    }
+  });
+
+  // -------------------------------------------
+  //  Type: Event Listener
+  //  Name: keyup
+  //  Description: Handles keyup presses
+  // -----
+
+  Q.el.addEventListener('keyup', function(e) {
+    delete keysdown[e.keyCode];
+    switch(e.keyCode){
+      case 9:
+      $(".scoreboard").fadeOut(100);
+        break;
+    }
+  });
+
+  Q.el.addEventListener('click', function(e) {
+    var player = Q("Player").first();
+    var weapon = Q("Weapon").first();
+    var x = e.offsetX || e.layerX,
+      y = e.offsetY || e.layerY,
+      stage = Q.stage();
+
+    var stageX = Q.canvasToStageX(x, stage),
+        stageY = Q.canvasToStageY(y, stage);
+
+    var deg = Math.atan2(stageY - player.p.y, stageX - player.p.x) * 180 / Math.PI;
+
+    var dy = Math.sin(deg * Math.PI / 180),
+        dx = Math.cos(deg * Math.PI / 180);
+
+    if (!clicked) {
+      if (player.p.opacity == 1) {
+        socket.emit('shoot', { playerId: player.p.playerId, x: player.p.x, y: player.p.y, dx: dx, dy: dy, deg: deg});
+
+        stage.insert(
+          new Q.Bullet({x: player.p.x + dx * 20,
+                        y: player.p.y + dy * 20,
+                        vx: dx * 1000,
+                        vy: dy * 1000,
+                        angle: global_deg
+          })
+        );
+        clicked = true;
+        setTimeout(function(){ clicked = false; }, weapon.p.shootTimeout);
+      }
+    }
+  });
+
+  // -------------------------------------------
+  //  Type: Event Listener
+  //  Name: mousemove
+  //  Description: Dedects mouse angle and sends it to the server
+  // -----
+
+  Q.el.addEventListener('mousemove', function(e) {
+    var player = Q("Player").first();
+
+    var x = e.offsetX || e.layerX,
+        y = e.offsetY || e.layerY,
+        stage = Q.stage();
+
+    var stageX = Q.canvasToStageX(x, stage),
+        stageY = Q.canvasToStageY(y, stage);
+
+    global_deg = Math.atan2(stageY - player.p.y, stageX - player.p.x) * 180 / Math.PI;
+  });
+
+  // -------------------------------------------
+  //  Type: Function
+  //  Name: createParticles
+  //  Description: Creates particles, duh
+  // -----
+
+  function createParticles(x, y, amount, color) {
+    for (var i = 0; i < amount; i++) {
+      var stage = Q.stage();
+
+      var deg = Math.floor(Math.random() * 180) + 1;
+
+      var dy = Math.sin(deg * Math.PI / 180) * Math.floor(Math.random() * 400) + 100,
+          dx = Math.cos(deg * Math.PI / 180) * Math.floor(Math.random() * 400) + 100;
+
+      stage.insert(new Q.Particle({x: x, y: y, vy: dy, vx: dx, color: color}));
+    }
+  }
+
 });

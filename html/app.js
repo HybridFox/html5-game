@@ -12,10 +12,16 @@ app.get('/', function(req, res){
 var playerCount = 0;
 var id = 0;
 
+setInterval(function() {
+  console.log("Spawning Item")
+  io.emit("spawnitem", {x: Math.floor(Math.random() * 400), y: Math.floor(Math.random() * 400)})
+}, 1000);
+
 io.on('connection', function (socket) {
   playerCount++;
   id++;
   console.log("Player connected");
+
   setTimeout(function () {
     socket.emit('connected', { playerId: id });
     io.emit('count', { playerCount: playerCount });

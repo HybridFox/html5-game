@@ -3,7 +3,7 @@ var players = [];
 var labels = [];
 var weapons = [];
 var keysdown = [];
-var socket = io.connect('http://10.68.246.11:80');
+var socket = io.connect('http://localhost:80');
 var UiPlayers = document.getElementById("players");
 var UiLives = document.getElementById("lives");
 var UiKillfeed = document.getElementById("killfeed");
@@ -90,6 +90,7 @@ require(objectFiles, function () {
          actor.player.p.flip = "";
        }
      } else {
+       console.log("Inserting Actor");
        var temp = new Q.Actor({playerId: data['playerId'], x: data['x'], y: data['y'], sheet: data['sheet'] });
        var temp_label = new Q.labelText({label: data["name"], color: "black", align: 'center', x: data['x'], y: data['y']});
        var temp_weapon = new Q.ActorWeapon({playerId: data['playerId'], x: data['x'], y: data['y']});
@@ -100,7 +101,10 @@ require(objectFiles, function () {
        stage.insert(temp_label);
        stage.insert(temp_weapon);
      }
+    });
 
+    socket.on("spawnitem", function(data) {
+      
     });
 
     socket.on("killed", function(data) {
