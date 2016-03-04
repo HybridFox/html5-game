@@ -3218,8 +3218,8 @@ Quintus.Input = function(Q) {
                        Z: 'fire',
                        X: 'action' };
 
-  var DEFAULT_TOUCH_CONTROLS  = [ ['left','images/pijllinks.png' ],
-                            ['right','images/pijlrechts.png' ],
+  var DEFAULT_TOUCH_CONTROLS  = [ ['left','<' ],
+                            ['right','>' ],
                             [],
                             ['action','^'],
                             ['fire', 'a' ]];
