@@ -3209,7 +3209,7 @@ Quintus.Input = function(Q) {
    */
   var KEY_NAMES = Q.KEY_NAMES = { LEFT: 81, RIGHT: 68, SPACE: 32,
                     UP: 90, DOWN: 83,
-                    Z: 80, X: 88   
+                    Z: 80, X: 32   
                   };
   
   var DEFAULT_KEYS = { LEFT : 'left', RIGHT: 'right',
@@ -3218,8 +3218,8 @@ Quintus.Input = function(Q) {
                        Z: 'fire',
                        X: 'action' };
 
-  var DEFAULT_TOUCH_CONTROLS  = [ ['left','pijllinks.png' ],
-                            ['right','pijlrechts.png' ],
+  var DEFAULT_TOUCH_CONTROLS  = [ ['left',pijllinks.png ],
+                            ['right',pijlrechts.png ],
                             [],
                             ['action','jump'],
                             ['fire', 'a' ]];
