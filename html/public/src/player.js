@@ -33,6 +33,7 @@ require([], function () {
   Q.Sprite.extend('Weapon', {
     init: function (p) {
       this._super(p, {
+        shootTimeout: 200,
         sheet: 'weapon',
         w: 10,
         h: 5,
@@ -79,6 +80,7 @@ require([], function () {
 
   Q.el.addEventListener('click', function(e) {
     var player = Q("Player").first();
+    var weapon = Q("Weapon").first();
     var x = e.offsetX || e.layerX,
       y = e.offsetY || e.layerY,
       stage = Q.stage();
@@ -91,17 +93,22 @@ require([], function () {
     var dy = Math.sin(deg * Math.PI / 180),
         dx = Math.cos(deg * Math.PI / 180);
 
-    if (player.p.opacity == 1) {
-      socket.emit('shoot', { playerId: player.p.playerId, x: player.p.x, y: player.p.y, dx: dx, dy: dy, deg: deg});
+    if (!clicked) {
+      if (player.p.opacity == 1) {
+        socket.emit('shoot', { playerId: player.p.playerId, x: player.p.x, y: player.p.y, dx: dx, dy: dy, deg: deg});
 
-      stage.insert(
-        new Q.Bullet({x: player.p.x + dx * 20,
-                      y: player.p.y + dy * 20,
-                      vx: dx * 1000,
-                      vy: dy * 1000,
-                      angle: global_deg
-        })
-      );
+        stage.insert(
+          new Q.Bullet({x: player.p.x + dx * 20,
+                        y: player.p.y + dy * 20,
+                        vx: dx * 1000,
+                        vy: dy * 1000,
+                        angle: global_deg
+          })
+        );
+        clicked = true;
+        console.log(weapon);
+        setTimeout(function(){ clicked = false; }, weapon.p.shootTimeout);
+      }
     }
   });
 
@@ -208,8 +215,15 @@ require([], function () {
         type: Q.PLAYER,
         collisionMask: Q.ACTOR
       });
+      this.p.xy = this.p.vy;
+      this.p.xx = this.p.vx;
       this.add("2d");
       this.on("hit",this,"collision");
+    },
+
+    step: function(dt) {
+      this.p.vy = this.p.xy;
+      this.p.vx = this.p.xx;
     },
 
     collision: function(col) {
@@ -242,10 +256,17 @@ require([], function () {
         w:10,
         h:4,
         type: Q.ACTOR,
-        collisionMask: Q.ACTOR
+        collisionMask: Q.ACTOR,
       });
+      this.p.xy = this.p.vy;
+      this.p.xx = this.p.vx;
       this.add("2d");
       this.on("hit",this,"collision");
+    },
+
+    step: function(dt) {
+      this.p.vy = this.p.xy;
+      this.p.vx = this.p.xx;
     },
 
     collision: function(col) {

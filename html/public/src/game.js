@@ -2,11 +2,12 @@
 var players = [];
 var labels = [];
 var weapons = [];
-var socket = io.connect('http://localhost:80');
+var socket = io.connect('http://10.68.246.11:80');
 var UiPlayers = document.getElementById("players");
 var UiLives = document.getElementById("lives");
 var UiKillfeed = document.getElementById("killfeed");
 var playerName = "Joining...";
+var clicked = false;
 
 var Q = Quintus({audioSupported: [ 'wav','mp3' ]})
       .include('Sprites, Scenes, Input, 2D, Anim, Touch, UI, Audio')
@@ -48,7 +49,7 @@ require(objectFiles, function () {
       stage.insert(player);
       stage.insert(weapon);
       stage.add('viewport').follow(player);
-      stage.viewport.scale = 1.5;
+      stage.viewport.scale = 1;
       stage.viewport.offsetY = 30;
       var lives = "";
       for (var i = 0; i < player.p.lives; i++) {
@@ -165,8 +166,8 @@ require(objectFiles, function () {
       console.log("Setting username: " + $("#username").val());
       var player = Q("Player").first();
       player.p.p_name = $("#username").val();
+      $(".menu").fadeOut();
     }
-    $(".menu").fadeOut();
     console.log("Starting stage setup");
   });
 
